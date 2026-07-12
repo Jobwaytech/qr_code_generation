@@ -27,12 +27,7 @@ export default function Login() {
     try {
       // Handle login logic here
       console.log("Login attempt:", formData, rememberMe);
-      window.alert(
-        "Login attempt: " +
-          JSON.stringify(formData) +
-          ", Remember Me: " +
-          rememberMe,
-      );
+
       if (!formData.email || !formData.password) {
         window.alert("Please fill in both email and password.");
         return;
@@ -41,7 +36,16 @@ export default function Login() {
         window.alert("Please enter a valid email address.");
         return;
       }
-      window.location.href = "/dashboard"; // Redirect to dashboard on successful login
+      if (formData.password.length < 6) {
+        window.alert("Password must be at least 6 characters long.");
+        return;
+      }
+      if (formData.email == "jobwaytech.gmail.com" && formData.password == "jobwaytech@123") {
+        window.alert("Login successful!");
+        window.location.href = "/student_management";
+        return;
+      }
+
       // You can add your login API call here
     } catch (error) {
       console.error("Login error:", error);

@@ -2,12 +2,32 @@ import Head from "next/head";
 import Image from "next/image";
 import { useState } from "react";
 
+type StudentVerification = {
+  id: string;
+  std_name: string;
+  std_roll_num: string;
+  cource_name: string;
+  certidicate_id: string;
+  issue_date: string;
+  batch_no: string;
+  student_id: string;
+  start_date: string;
+  end_date: string;
+  intership_domain: string;
+  project_title: string;
+  intership_mode: string;
+  certificate_url?: string;
+  student_photo?: string;
+};
+
 const VerifyQrPage = () => {
   const [formData, setFormData] = useState({
     certificateId: "",
     issueDate: "",
   });
   const [submitted, setSubmitted] = useState(false);
+  const [student, setStudent] = useState<StudentVerification | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -17,13 +37,40 @@ const VerifyQrPage = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.certificateId || !formData.issueDate) {
       setSubmitted(false);
+      setStudent(null);
+      setError("Please provide both certificate ID and issue date.");
       return;
     }
+
     setSubmitted(true);
+    setStudent(null);
+    setError(null);
+
+    try {
+      const response = await fetch(
+        `/api/student?certificate_id=${encodeURIComponent(formData.certificateId)}&issue_date=${encodeURIComponent(
+          formData.issueDate,
+        )}`,
+      );
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "Certificate not found.");
+        setSubmitted(false);
+        return;
+      }
+
+      window.location.href = `/student_details/id=${data.student.id}`;
+
+      setStudent(data.student || null);
+    } catch (fetchError) {
+      setError((fetchError as Error).message || "Unable to verify certificate.");
+      setSubmitted(false);
+    }
   };
 
   return (
@@ -85,11 +132,55 @@ const VerifyQrPage = () => {
             </button>
           </form>
 
-          {submitted && (
-            <p className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+          {error ? (
+            <div className="mt-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+              {error}
+            </div>
+          ) : student ? (
+            <div className="mt-4 space-y-4 rounded-3xl border border-slate-200 bg-slate-50 p-5 text-slate-900 shadow-sm">
+              <p className="text-sm text-slate-500">Certificate verified successfully.</p>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Student Name</p>
+                  <p className="font-semibold">{student.std_name}</p>
+                </div>
+                <div>
+                  <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Roll Number</p>
+                  <p className="font-semibold">{student.std_roll_num}</p>
+                </div>
+                <div>
+                  <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Course</p>
+                  <p className="font-semibold">{student.cource_name}</p>
+                </div>
+                <div>
+                  <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Batch</p>
+                  <p className="font-semibold">{student.batch_no}</p>
+                </div>
+                <div>
+                  <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Issue Date</p>
+                  <p className="font-semibold">{student.issue_date}</p>
+                </div>
+                <div>
+                  <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Internship Domain</p>
+                  <p className="font-semibold">{student.intership_domain}</p>
+                </div>
+              </div>
+              {student.certificate_url ? (
+                <a
+                  href={student.certificate_url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
+                >
+                  View Certificate
+                </a>
+              ) : null}
+            </div>
+          ) : submitted ? (
+            <p className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
               Verification request submitted for certificate {formData.certificateId}.
             </p>
-          )}
+          ) : null}
         </section>
       </main>
     </>
