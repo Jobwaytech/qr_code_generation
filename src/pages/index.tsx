@@ -40,7 +40,7 @@ export default function Login() {
         window.alert("Password must be at least 6 characters long.");
         return;
       }
-      if (formData.email == "jobwaytech.gmail.com" && formData.password == "jobwaytech@123") {
+      if (formData.email == "jobwaytech@gmail.com" && formData.password == "jobwaytech@123") {
         window.alert("Login successful!");
         window.location.href = "/student_management";
         return;
