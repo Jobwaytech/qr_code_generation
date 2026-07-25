@@ -5,7 +5,7 @@ import clientPromise from "@/lib/mongodb";
 export const config = {
   api: {
     bodyParser: {
-      sizeLimit: "20mb",
+      sizeLimit: "50mb",
     },
   },
 };
@@ -149,7 +149,7 @@ export default async function handler(
     const docs = await db
       .collection("students")
       .find()
-      .sort({ certificateId: 1 })
+      .sort({ createdAt: 1 })
       .toArray();
     const students = docs.map((doc) => ({
       id: doc._id.toString(),
