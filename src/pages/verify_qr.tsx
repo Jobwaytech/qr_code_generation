@@ -68,7 +68,9 @@ const VerifyQrPage = () => {
 
       setStudent(data.student || null);
     } catch (fetchError) {
-      setError((fetchError as Error).message || "Unable to verify certificate.");
+      setError(
+        (fetchError as Error).message || "Unable to verify certificate.",
+      );
       setSubmitted(false);
     }
   };
@@ -84,17 +86,29 @@ const VerifyQrPage = () => {
         <section className="w-full max-w-xl rounded-3xl border border-slate-200 bg-white p-8 shadow-2xl shadow-slate-200/70">
           <div className="mb-8 flex items-center gap-4">
             <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-2xl bg-blue-50">
-              <Image src="/Logo.png" alt="Company logo" width={80} height={80} />
+              <Image
+                src="/Logo.png"
+                alt="Company logo"
+                width={80}
+                height={80}
+              />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-slate-900">Certificate Verification</h1>
-              <p className="mt-1 text-sm text-slate-500">Enter the certificate details below</p>
+              <h1 className="text-2xl font-bold text-slate-900">
+                Certificate Verification
+              </h1>
+              <p className="mt-1 text-sm text-slate-500">
+                Enter the certificate details below
+              </p>
             </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="mb-2 block text-sm font-semibold text-slate-700" htmlFor="certificateId">
+              <label
+                className="mb-2 block text-sm font-semibold text-slate-700"
+                htmlFor="certificateId"
+              >
                 Certificate ID
               </label>
               <input
@@ -110,7 +124,10 @@ const VerifyQrPage = () => {
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-semibold text-slate-700" htmlFor="issueDate">
+              <label
+                className="mb-2 block text-sm font-semibold text-slate-700"
+                htmlFor="issueDate"
+              >
                 Issue Date
               </label>
               <input
@@ -138,30 +155,44 @@ const VerifyQrPage = () => {
             </div>
           ) : student ? (
             <div className="mt-4 space-y-4 rounded-3xl border border-slate-200 bg-slate-50 p-5 text-slate-900 shadow-sm">
-              <p className="text-sm text-slate-500">Certificate verified successfully.</p>
+              <p className="text-sm text-slate-500">
+                Certificate verified successfully.
+              </p>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Student Name</p>
+                  <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+                    Student Name
+                  </p>
                   <p className="font-semibold">{student.std_name}</p>
                 </div>
                 <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Roll Number</p>
+                  <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+                    Roll Number
+                  </p>
                   <p className="font-semibold">{student.std_roll_num}</p>
                 </div>
                 <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Course</p>
+                  <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+                    Course
+                  </p>
                   <p className="font-semibold">{student.cource_name}</p>
                 </div>
                 <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Batch</p>
+                  <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+                    Batch
+                  </p>
                   <p className="font-semibold">{student.batch_no}</p>
                 </div>
                 <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Issue Date</p>
+                  <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+                    Issue Date
+                  </p>
                   <p className="font-semibold">{student.issue_date}</p>
                 </div>
                 <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Internship Domain</p>
+                  <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+                    Internship Domain
+                  </p>
                   <p className="font-semibold">{student.intership_domain}</p>
                 </div>
               </div>
@@ -178,7 +209,8 @@ const VerifyQrPage = () => {
             </div>
           ) : submitted ? (
             <p className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
-              Verification request submitted for certificate {formData.certificateId}.
+              Verification request submitted for certificate{" "}
+              {formData.certificateId}.
             </p>
           ) : null}
         </section>

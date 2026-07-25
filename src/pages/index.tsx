@@ -1,9 +1,10 @@
 import Head from "next/head";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "@/styles/login.module.css";
 import Image from "next/image";
 
 export default function Login() {
+  const [mounted, setMounted] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -20,6 +21,10 @@ export default function Login() {
       [name]: value,
     }));
   };
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,7 +45,10 @@ export default function Login() {
         window.alert("Password must be at least 6 characters long.");
         return;
       }
-      if (formData.email == "jobwaytech@gmail.com" && formData.password == "jobwaytech@123") {
+      if (
+        formData.email == "jobwaytech@gmail.com" &&
+        formData.password == "jobwaytech@123"
+      ) {
         window.alert("Login successful!");
         window.location.href = "/student_management";
         return;
@@ -75,49 +83,55 @@ export default function Login() {
             <p className={styles.tagline}>Sign in to your enterprise account</p>
           </div>
 
-          <form onSubmit={handleSubmit} className={styles.form}>
-            <div className={styles.formGroup}>
-              <input
-                type="email"
-                name="email"
-                placeholder="Email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                className={styles.input}
-              />
-            </div>
-
-            <div className={styles.formGroup}>
-              <input
-                type="password"
-                name="password"
-                placeholder="Password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-                className={styles.input}
-              />
-            </div>
-
-            <div className={styles.checkboxRow}>
-              <label className={styles.checkbox}>
+          {mounted && (
+            <form onSubmit={handleSubmit} className={styles.form}>
+              <div className={styles.formGroup}>
                 <input
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
+                  type="email"
+                  name="email"
+                  placeholder="Email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  className={styles.input}
                 />
-                Remember Me
-              </label>
-              <a href="#" className={styles.forgotLink}>
-                Forgot password?
-              </a>
-            </div>
+              </div>
 
-            <button type="submit" disabled={loading} className={styles.button}>
-              {loading ? "Logging in..." : "Login"}
-            </button>
-          </form>
+              <div className={styles.formGroup}>
+                <input
+                  type="password"
+                  name="password"
+                  placeholder="Password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                  className={styles.input}
+                />
+              </div>
+
+              <div className={styles.checkboxRow}>
+                <label className={styles.checkbox}>
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                  />
+                  Remember Me
+                </label>
+                <a href="#" className={styles.forgotLink}>
+                  Forgot password?
+                </a>
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className={styles.button}
+              >
+                {loading ? "Logging in..." : "Login"}
+              </button>
+            </form>
+          )}
         </div>
       </div>
     </>

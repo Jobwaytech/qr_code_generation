@@ -46,7 +46,9 @@ const requiredFields = [
 
 function validateStudent(body: Partial<StudentRecord>) {
   return requiredFields.find(
-    (field) => !body[field as keyof StudentRecord] || body[field as keyof StudentRecord] === "",
+    (field) =>
+      !body[field as keyof StudentRecord] ||
+      body[field as keyof StudentRecord] === "",
   );
 }
 
@@ -59,14 +61,22 @@ export default async function handler(
 
   if (req.method === "GET") {
     const recordId = String(req.query.id || "").trim();
-    const certificateId = String(req.query.certificate_id || req.query.certidicate_id || "").trim();
-    const issueDate = req.query.issue_date ? String(req.query.issue_date).trim() : undefined;
+    const certificateId = String(
+      req.query.certificate_id || req.query.certidicate_id || "",
+    ).trim();
+    const issueDate = req.query.issue_date
+      ? String(req.query.issue_date).trim()
+      : undefined;
 
     if (recordId) {
       try {
-        const doc = await db.collection("students").findOne({ _id: new ObjectId(recordId) });
+        const doc = await db
+          .collection("students")
+          .findOne({ _id: new ObjectId(recordId) });
         if (!doc) {
-          return res.status(404).json({ ok: false, error: "Student not found." });
+          return res
+            .status(404)
+            .json({ ok: false, error: "Student not found." });
         }
 
         return res.status(200).json({
@@ -92,7 +102,9 @@ export default async function handler(
           },
         });
       } catch (error) {
-        return res.status(400).json({ ok: false, error: "Invalid student id." });
+        return res
+          .status(400)
+          .json({ ok: false, error: "Invalid student id." });
       }
     }
 
@@ -105,7 +117,9 @@ export default async function handler(
       const doc = await db.collection("students").findOne(filter);
 
       if (!doc) {
-        return res.status(404).json({ ok: false, error: "Certificate not found." });
+        return res
+          .status(404)
+          .json({ ok: false, error: "Certificate not found." });
       }
 
       return res.status(200).json({
@@ -132,7 +146,11 @@ export default async function handler(
       });
     }
 
-    const docs = await db.collection("students").find().sort({ createdAt: -1 }).toArray();
+    const docs = await db
+      .collection("students")
+      .find()
+      .sort({ certificateId: 1 })
+      .toArray();
     const students = docs.map((doc) => ({
       id: doc._id.toString(),
       student_photo: doc.student_photo,
@@ -160,7 +178,9 @@ export default async function handler(
     const missingField = validateStudent(body);
 
     if (missingField) {
-      return res.status(400).json({ ok: false, error: `${missingField} is required.` });
+      return res
+        .status(400)
+        .json({ ok: false, error: `${missingField} is required.` });
     }
 
     try {
@@ -185,7 +205,9 @@ export default async function handler(
       const result = await db.collection("students").insertOne(student);
       return res.status(201).json({ ok: true, insertedId: result.insertedId });
     } catch (error) {
-      return res.status(500).json({ ok: false, error: (error as Error).message });
+      return res
+        .status(500)
+        .json({ ok: false, error: (error as Error).message });
     }
   }
 
@@ -193,12 +215,16 @@ export default async function handler(
     const body = req.body as Partial<StudentRecord> & { id?: string };
     const recordId = body.id;
     if (!recordId) {
-      return res.status(400).json({ ok: false, error: "Student id is required for update." });
+      return res
+        .status(400)
+        .json({ ok: false, error: "Student id is required for update." });
     }
 
     const missingField = validateStudent(body);
     if (missingField) {
-      return res.status(400).json({ ok: false, error: `${missingField} is required.` });
+      return res
+        .status(400)
+        .json({ ok: false, error: `${missingField} is required.` });
     }
 
     try {
@@ -220,10 +246,9 @@ export default async function handler(
         updatedAt: new Date().toISOString(),
       };
 
-      const result = await db.collection("students").updateOne(
-        { _id: new ObjectId(recordId) },
-        { $set: update },
-      );
+      const result = await db
+        .collection("students")
+        .updateOne({ _id: new ObjectId(recordId) }, { $set: update });
 
       if (result.matchedCount === 0) {
         return res.status(404).json({ ok: false, error: "Student not found." });
@@ -231,7 +256,9 @@ export default async function handler(
 
       return res.status(200).json({ ok: true, updatedId: recordId });
     } catch (error) {
-      return res.status(500).json({ ok: false, error: (error as Error).message });
+      return res
+        .status(500)
+        .json({ ok: false, error: (error as Error).message });
     }
   }
 

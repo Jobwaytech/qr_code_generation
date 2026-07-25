@@ -41,19 +41,26 @@ const initialState: StudentFormState = {
 };
 
 const StudentManagement = () => {
+  const [mounted, setMounted] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState<StudentFormState>(initialState);
   const [students, setStudents] = useState<StudentData[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [status, setStatus] = useState<{ type: "idle" | "success" | "error"; message: string }>(
-    { type: "idle", message: "" },
-  );
+  const [status, setStatus] = useState<{
+    type: "idle" | "success" | "error";
+    message: string;
+  }>({ type: "idle", message: "" });
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    fetchStudents();
+    setMounted(true);
   }, []);
+  useEffect(() => {
+    if (mounted) {
+      fetchStudents();
+    }
+  }, [mounted]);
 
   const fetchStudents = async () => {
     setLoading(true);
@@ -63,7 +70,10 @@ const StudentManagement = () => {
       if (response.ok) {
         setStudents(data.students ?? []);
       } else {
-        setStatus({ type: "error", message: data.error || "Unable to load students." });
+        setStatus({
+          type: "error",
+          message: data.error || "Unable to load students.",
+        });
       }
     } catch (error) {
       setStatus({ type: "error", message: (error as Error).message });
@@ -72,7 +82,9 @@ const StudentManagement = () => {
     }
   };
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     const { name, value } = event.target;
     setForm((current) => ({ ...current, [name]: value }));
   };
@@ -107,7 +119,10 @@ const StudentManagement = () => {
     if (!form.certidicate_id) return;
     setForm((current) => ({
       ...current,
-      certidicate_id: formatCertificateId(current.certidicate_id, current.issue_date),
+      certidicate_id: formatCertificateId(
+        current.certidicate_id,
+        current.issue_date,
+      ),
     }));
   };
 
@@ -127,7 +142,9 @@ const StudentManagement = () => {
     reader.readAsDataURL(file);
   };
 
-  const handleCertificateUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCertificateUpload = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = event.target.files?.[0];
     if (!file) {
       return;
@@ -179,7 +196,12 @@ const StudentManagement = () => {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setStatus({ type: "idle", message: editingId ? "Updating student record..." : "Saving student record..." });
+    setStatus({
+      type: "idle",
+      message: editingId
+        ? "Updating student record..."
+        : "Saving student record...",
+    });
 
     try {
       const response = await fetch("/api/student", {
@@ -189,7 +211,9 @@ const StudentManagement = () => {
       });
 
       const text = await response.text();
-      const data = response.headers.get("content-type")?.includes("application/json")
+      const data = response.headers
+        .get("content-type")
+        ?.includes("application/json")
         ? JSON.parse(text)
         : { error: text };
 
@@ -213,7 +237,8 @@ const StudentManagement = () => {
                 Student Management
               </h1>
               <p className="text-slate-300 max-w-3xl">
-                Manage student internship details, upload photos, and edit records using the same dashboard style.
+                Manage student internship details, upload photos, and edit
+                records using the same dashboard style.
               </p>
             </div>
 
@@ -221,21 +246,31 @@ const StudentManagement = () => {
               <div className="card group relative overflow-hidden p-6 rounded-3xl bg-slate-950/90 border border-slate-800 shadow-xl shadow-slate-950/20 hover:shadow-purple-500/20 transition-all">
                 <div className="absolute inset-0 bg-linear-to-r from-purple-600/0 via-purple-600/0 to-purple-600/0 group-hover:from-purple-600/10 group-hover:via-purple-600/7 group-hover:to-purple-600/0 transition-all" />
                 <div className="relative z-10">
-                  <p className="text-xs uppercase tracking-widest text-slate-400 font-bold mb-3">Total Students</p>
-                  <p className="text-4xl font-black text-white">{students.length}</p>
+                  <p className="text-xs uppercase tracking-widest text-slate-400 font-bold mb-3">
+                    Total Students
+                  </p>
+                  <p className="text-4xl font-black text-white">
+                    {students.length}
+                  </p>
                 </div>
               </div>
               <div className="card group relative overflow-hidden p-6 rounded-3xl bg-slate-950/90 border border-slate-800 shadow-xl shadow-slate-950/20 hover:shadow-sky-500/20 transition-all">
                 <div className="absolute inset-0 bg-linear-to-r from-sky-600/0 via-sky-600/0 to-sky-600/0 group-hover:from-sky-600/10 group-hover:via-sky-600/7 group-hover:to-sky-600/0 transition-all" />
                 <div className="relative z-10">
-                  <p className="text-xs uppercase tracking-widest text-slate-400 font-bold mb-3">Recent Action</p>
-                  <p className="text-4xl font-black text-white">{editingId ? "Editing" : "Ready"}</p>
+                  <p className="text-xs uppercase tracking-widest text-slate-400 font-bold mb-3">
+                    Recent Action
+                  </p>
+                  <p className="text-4xl font-black text-white">
+                    {editingId ? "Editing" : "Ready"}
+                  </p>
                 </div>
               </div>
               <div className="card group relative overflow-hidden p-6 rounded-3xl bg-slate-950/90 border border-slate-800 shadow-xl shadow-slate-950/20 hover:shadow-fuchsia-500/20 transition-all">
                 <div className="absolute inset-0 bg-linear-to-r from-fuchsia-600/0 via-fuchsia-600/0 to-fuchsia-600/0 group-hover:from-fuchsia-600/10 group-hover:via-fuchsia-600/7 group-hover:to-fuchsia-600/0 transition-all" />
                 <div className="relative z-10">
-                  <p className="text-xs uppercase tracking-widest text-slate-400 font-bold mb-3">Upload ETA</p>
+                  <p className="text-xs uppercase tracking-widest text-slate-400 font-bold mb-3">
+                    Upload ETA
+                  </p>
                   <p className="text-4xl font-black text-white">Instant</p>
                 </div>
               </div>
@@ -244,8 +279,13 @@ const StudentManagement = () => {
             <div className="card rounded-3xl bg-slate-950/90 border border-slate-800 shadow-xl shadow-slate-950/20 p-8">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
                 <div>
-                  <h2 className="text-2xl font-bold text-white">Student Records</h2>
-                  <p className="text-slate-400">View stored students and open the form to add or edit a record.</p>
+                  <h2 className="text-2xl font-bold text-white">
+                    Student Records
+                  </h2>
+                  <p className="text-slate-400">
+                    View stored students and open the form to add or edit a
+                    record.
+                  </p>
                 </div>
                 <button
                   type="button"
@@ -260,6 +300,9 @@ const StudentManagement = () => {
                 <table className="min-w-full divide-y divide-slate-700 text-left text-sm text-slate-300">
                   <thead className="bg-slate-900 text-slate-400">
                     <tr>
+                      <th className="px-4 py-4 font-semibold">
+                        Certificate ID
+                      </th>
                       <th className="px-4 py-4 font-semibold">Name</th>
                       <th className="px-4 py-4 font-semibold">Roll</th>
                       <th className="px-4 py-4 font-semibold">Course</th>
@@ -272,19 +315,32 @@ const StudentManagement = () => {
                   <tbody className="divide-y divide-slate-800 bg-slate-950">
                     {students.length === 0 ? (
                       <tr>
-                        <td colSpan={7} className="px-4 py-8 text-center text-slate-500">
+                        <td
+                          colSpan={7}
+                          className="px-4 py-8 text-center text-slate-500"
+                        >
                           No students found. Click Add Student to create one.
                         </td>
                       </tr>
                     ) : (
                       students.map((student) => (
-                        <tr key={student.id} className="hover:bg-slate-900/70 transition-colors">
-                          <td className="px-4 py-4 font-medium text-white">{student.std_name}</td>
+                        <tr
+                          key={student.id}
+                          className="hover:bg-slate-900/70 transition-colors"
+                        >
+                          <td className="px-4 py-4 font-medium text-white">
+                            {student.certidicate_id}
+                          </td>
+                          <td className="px-4 py-4 font-medium text-white">
+                            {student.std_name}
+                          </td>
                           <td className="px-4 py-4">{student.std_roll_num}</td>
                           <td className="px-4 py-4">{student.cource_name}</td>
                           <td className="px-4 py-4">{student.batch_no}</td>
                           <td className="px-4 py-4">{student.student_id}</td>
-                          <td className="px-4 py-4">{student.intership_domain}</td>
+                          <td className="px-4 py-4">
+                            {student.intership_domain}
+                          </td>
                           <td className="px-4 py-4">
                             <button
                               type="button"
@@ -313,7 +369,9 @@ const StudentManagement = () => {
                 <h3 className="text-2xl font-bold text-white">
                   {editingId ? "Edit Student" : "Add Student"}
                 </h3>
-                <p className="text-sm text-slate-400">Upload photo and complete the student details below.</p>
+                <p className="text-sm text-slate-400">
+                  Upload photo and complete the student details below.
+                </p>
               </div>
               <button
                 type="button"
@@ -324,224 +382,262 @@ const StudentManagement = () => {
               </button>
             </div>
             <div className="px-6 py-6">
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid gap-6 sm:grid-cols-2">
-                  <label className="block sm:col-span-2">
-                    <span className="text-sm font-medium text-slate-300">Upload Student Photo</span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handlePhotoUpload}
-                      className="mt-2 w-full rounded-3xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm text-slate-200 shadow-sm outline-none transition file:mr-4 file:rounded-full file:border-0 file:bg-purple-600 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
-                    />
-                  </label>
-
-                  <label className="block sm:col-span-2">
-                    <span className="text-sm font-medium text-slate-300">Student Photo URL</span>
-                    <input
-                      name="student_photo"
-                      value={form.student_photo}
-                      onChange={handleChange}
-                      type="text"
-                      className="mt-2 w-full rounded-3xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm text-slate-200 shadow-sm outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
-                      placeholder="https://example.com/photo.jpg or uploaded image"
-                    />
-                    {form.student_photo ? (
-                      <img
-                        src={form.student_photo}
-                        alt="Student preview"
-                        className="mt-3 h-32 w-32 rounded-3xl object-cover shadow-xl"
+              {mounted && (
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="grid gap-6 sm:grid-cols-2">
+                    <label className="block sm:col-span-2">
+                      <span className="text-sm font-medium text-slate-300">
+                        Upload Student Photo
+                      </span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handlePhotoUpload}
+                        className="mt-2 w-full rounded-3xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm text-slate-200 shadow-sm outline-none transition file:mr-4 file:rounded-full file:border-0 file:bg-purple-600 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
                       />
-                    ) : null}
-                  </label>
+                    </label>
 
-                  <label className="block sm:col-span-2">
-                    <span className="text-sm font-medium text-slate-300">Upload Certificate</span>
-                    <input
-                      type="file"
-                      accept="image/*,application/pdf"
-                      onChange={handleCertificateUpload}
-                      className="mt-2 w-full rounded-3xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm text-slate-200 shadow-sm outline-none transition file:mr-4 file:rounded-full file:border-0 file:bg-purple-600 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
-                    />
-                  </label>
+                    <label className="block sm:col-span-2">
+                      <span className="text-sm font-medium text-slate-300">
+                        Student Photo URL
+                      </span>
+                      <input
+                        name="student_photo"
+                        value={form.student_photo}
+                        onChange={handleChange}
+                        type="text"
+                        className="mt-2 w-full rounded-3xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm text-slate-200 shadow-sm outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
+                        placeholder="https://example.com/photo.jpg or uploaded image"
+                      />
+                      {form.student_photo ? (
+                        <img
+                          src={form.student_photo}
+                          alt="Student preview"
+                          className="mt-3 h-32 w-32 rounded-3xl object-cover shadow-xl"
+                        />
+                      ) : null}
+                    </label>
 
-                  <label className="block sm:col-span-2">
-                    <span className="text-sm font-medium text-slate-300">Certificate URL</span>
-                    <input
-                      name="certificate_url"
-                      value={form.certificate_url}
-                      onChange={handleChange}
-                      type="text"
-                      className="mt-2 w-full rounded-3xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm text-slate-200 shadow-sm outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
-                      placeholder="https://example.com/certificate.pdf or uploaded certificate"
-                    />
-                    {form.certificate_url ? (
-                      <p className="mt-3 text-sm text-slate-400 wrap-break-word">
-                        Uploaded certificate ready to save.
+                    <label className="block sm:col-span-2">
+                      <span className="text-sm font-medium text-slate-300">
+                        Upload Certificate
+                      </span>
+                      <input
+                        type="file"
+                        accept="image/*,application/pdf"
+                        onChange={handleCertificateUpload}
+                        className="mt-2 w-full rounded-3xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm text-slate-200 shadow-sm outline-none transition file:mr-4 file:rounded-full file:border-0 file:bg-purple-600 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
+                      />
+                    </label>
+
+                    <label className="block sm:col-span-2">
+                      <span className="text-sm font-medium text-slate-300">
+                        Certificate URL
+                      </span>
+                      <input
+                        name="certificate_url"
+                        value={form.certificate_url}
+                        onChange={handleChange}
+                        type="text"
+                        className="mt-2 w-full rounded-3xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm text-slate-200 shadow-sm outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
+                        placeholder="https://example.com/certificate.pdf or uploaded certificate"
+                      />
+                      {form.certificate_url ? (
+                        <p className="mt-3 text-sm text-slate-400 wrap-break-word">
+                          Uploaded certificate ready to save.
+                        </p>
+                      ) : null}
+                    </label>
+
+                    <label className="block">
+                      <span className="text-sm font-medium text-slate-300">
+                        Student Name
+                      </span>
+                      <input
+                        name="std_name"
+                        value={form.std_name}
+                        onChange={handleChange}
+                        type="text"
+                        required
+                        className="mt-2 w-full rounded-3xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm text-slate-200 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
+                      />
+                    </label>
+
+                    <label className="block">
+                      <span className="text-sm font-medium text-slate-300">
+                        Roll Number
+                      </span>
+                      <input
+                        name="std_roll_num"
+                        value={form.std_roll_num}
+                        onChange={handleChange}
+                        type="text"
+                        required
+                        className="mt-2 w-full rounded-3xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm text-slate-200 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
+                      />
+                    </label>
+
+                    <label className="block">
+                      <span className="text-sm font-medium text-slate-300">
+                        Course Name
+                      </span>
+                      <input
+                        name="cource_name"
+                        value={form.cource_name}
+                        onChange={handleChange}
+                        type="text"
+                        required
+                        className="mt-2 w-full rounded-3xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm text-slate-200 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
+                      />
+                    </label>
+
+                    <label className="block">
+                      <span className="text-sm font-medium text-slate-300">
+                        Certificate ID
+                      </span>
+                      <input
+                        name="certidicate_id"
+                        value={form.certidicate_id}
+                        onChange={handleChange}
+                        onBlur={handleCertificateIdBlur}
+                        type="text"
+                        required
+                        className="mt-2 w-full rounded-3xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm text-slate-200 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
+                        placeholder="JWT-yyyy-mm/101,102"
+                      />
+                      <p className="mt-2 text-xs text-slate-500">
+                        Format example: JWT-2026-07/101,102
                       </p>
-                    ) : null}
-                  </label>
+                    </label>
 
-                  <label className="block">
-                    <span className="text-sm font-medium text-slate-300">Student Name</span>
-                    <input
-                      name="std_name"
-                      value={form.std_name}
-                      onChange={handleChange}
-                      type="text"
-                      required
-                      className="mt-2 w-full rounded-3xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm text-slate-200 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
-                    />
-                  </label>
+                    <label className="block">
+                      <span className="text-sm font-medium text-slate-300">
+                        Issue Date
+                      </span>
+                      <input
+                        name="issue_date"
+                        value={form.issue_date}
+                        onChange={handleChange}
+                        type="date"
+                        required
+                        className="mt-2 w-full rounded-3xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm text-slate-200 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
+                      />
+                    </label>
 
-                  <label className="block">
-                    <span className="text-sm font-medium text-slate-300">Roll Number</span>
-                    <input
-                      name="std_roll_num"
-                      value={form.std_roll_num}
-                      onChange={handleChange}
-                      type="text"
-                      required
-                      className="mt-2 w-full rounded-3xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm text-slate-200 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
-                    />
-                  </label>
+                    <label className="block">
+                      <span className="text-sm font-medium text-slate-300">
+                        Batch No
+                      </span>
+                      <input
+                        name="batch_no"
+                        value={form.batch_no}
+                        onChange={handleChange}
+                        type="text"
+                        required
+                        className="mt-2 w-full rounded-3xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm text-slate-200 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
+                      />
+                    </label>
 
-                  <label className="block">
-                    <span className="text-sm font-medium text-slate-300">Course Name</span>
-                    <input
-                      name="cource_name"
-                      value={form.cource_name}
-                      onChange={handleChange}
-                      type="text"
-                      required
-                      className="mt-2 w-full rounded-3xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm text-slate-200 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
-                    />
-                  </label>
+                    <label className="block">
+                      <span className="text-sm font-medium text-slate-300">
+                        Student ID
+                      </span>
+                      <input
+                        name="student_id"
+                        value={form.student_id}
+                        onChange={handleChange}
+                        type="text"
+                        required
+                        className="mt-2 w-full rounded-3xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm text-slate-200 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
+                      />
+                    </label>
 
-                  <label className="block">
-                    <span className="text-sm font-medium text-slate-300">Certificate ID</span>
-                    <input
-                      name="certidicate_id"
-                      value={form.certidicate_id}
-                      onChange={handleChange}
-                      onBlur={handleCertificateIdBlur}
-                      type="text"
-                      required
-                      className="mt-2 w-full rounded-3xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm text-slate-200 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
-                      placeholder="JWT-yyyy-mm/101,102"
-                    />
-                    <p className="mt-2 text-xs text-slate-500">Format example: JWT-2026-07/101,102</p>
-                  </label>
+                    <label className="block">
+                      <span className="text-sm font-medium text-slate-300">
+                        Start Date
+                      </span>
+                      <input
+                        name="start_date"
+                        value={form.start_date}
+                        onChange={handleChange}
+                        type="date"
+                        required
+                        className="mt-2 w-full rounded-3xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm text-slate-200 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
+                      />
+                    </label>
 
-                  <label className="block">
-                    <span className="text-sm font-medium text-slate-300">Issue Date</span>
-                    <input
-                      name="issue_date"
-                      value={form.issue_date}
-                      onChange={handleChange}
-                      type="date"
-                      required
-                      className="mt-2 w-full rounded-3xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm text-slate-200 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
-                    />
-                  </label>
+                    <label className="block">
+                      <span className="text-sm font-medium text-slate-300">
+                        End Date
+                      </span>
+                      <input
+                        name="end_date"
+                        value={form.end_date}
+                        onChange={handleChange}
+                        type="date"
+                        required
+                        className="mt-2 w-full rounded-3xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm text-slate-200 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
+                      />
+                    </label>
 
-                  <label className="block">
-                    <span className="text-sm font-medium text-slate-300">Batch No</span>
-                    <input
-                      name="batch_no"
-                      value={form.batch_no}
-                      onChange={handleChange}
-                      type="text"
-                      required
-                      className="mt-2 w-full rounded-3xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm text-slate-200 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
-                    />
-                  </label>
+                    <label className="block sm:col-span-2">
+                      <span className="text-sm font-medium text-slate-300">
+                        Internship Domain
+                      </span>
+                      <input
+                        name="intership_domain"
+                        value={form.intership_domain}
+                        onChange={handleChange}
+                        type="text"
+                        required
+                        className="mt-2 w-full rounded-3xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm text-slate-200 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
+                      />
+                    </label>
 
-                  <label className="block">
-                    <span className="text-sm font-medium text-slate-300">Student ID</span>
-                    <input
-                      name="student_id"
-                      value={form.student_id}
-                      onChange={handleChange}
-                      type="text"
-                      required
-                      className="mt-2 w-full rounded-3xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm text-slate-200 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
-                    />
-                  </label>
+                    <label className="block sm:col-span-2">
+                      <span className="text-sm font-medium text-slate-300">
+                        Project Title
+                      </span>
+                      <input
+                        name="project_title"
+                        value={form.project_title}
+                        onChange={handleChange}
+                        type="text"
+                        required
+                        className="mt-2 w-full rounded-3xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm text-slate-200 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
+                      />
+                    </label>
 
-                  <label className="block">
-                    <span className="text-sm font-medium text-slate-300">Start Date</span>
-                    <input
-                      name="start_date"
-                      value={form.start_date}
-                      onChange={handleChange}
-                      type="date"
-                      required
-                      className="mt-2 w-full rounded-3xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm text-slate-200 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
-                    />
-                  </label>
+                    <label className="block sm:col-span-2">
+                      <span className="text-sm font-medium text-slate-300">
+                        Internship Mode
+                      </span>
+                      <input
+                        name="intership_mode"
+                        value={form.intership_mode}
+                        onChange={handleChange}
+                        type="text"
+                        required
+                        className="mt-2 w-full rounded-3xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm text-slate-200 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
+                      />
+                    </label>
+                  </div>
 
-                  <label className="block">
-                    <span className="text-sm font-medium text-slate-300">End Date</span>
-                    <input
-                      name="end_date"
-                      value={form.end_date}
-                      onChange={handleChange}
-                      type="date"
-                      required
-                      className="mt-2 w-full rounded-3xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm text-slate-200 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
-                    />
-                  </label>
-
-                  <label className="block sm:col-span-2">
-                    <span className="text-sm font-medium text-slate-300">Internship Domain</span>
-                    <input
-                      name="intership_domain"
-                      value={form.intership_domain}
-                      onChange={handleChange}
-                      type="text"
-                      required
-                      className="mt-2 w-full rounded-3xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm text-slate-200 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
-                    />
-                  </label>
-
-                  <label className="block sm:col-span-2">
-                    <span className="text-sm font-medium text-slate-300">Project Title</span>
-                    <input
-                      name="project_title"
-                      value={form.project_title}
-                      onChange={handleChange}
-                      type="text"
-                      required
-                      className="mt-2 w-full rounded-3xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm text-slate-200 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
-                    />
-                  </label>
-
-                  <label className="block sm:col-span-2">
-                    <span className="text-sm font-medium text-slate-300">Internship Mode</span>
-                    <input
-                      name="intership_mode"
-                      value={form.intership_mode}
-                      onChange={handleChange}
-                      type="text"
-                      required
-                      className="mt-2 w-full rounded-3xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm text-slate-200 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20"
-                    />
-                  </label>
-                </div>
-
-                <div className="flex flex-col gap-4 pt-4 sm:flex-row sm:items-center sm:justify-between sm:pt-6">
-                  <button
-                    type="submit"
-                    className="inline-flex items-center justify-center rounded-3xl bg-linear-to-r from-purple-600 to-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-500/30 transition hover:scale-[1.02]"
-                  >
-                    {editingId ? "Update Student" : "Save Student"}
-                  </button>
-                  <p className={`text-sm ${status.type === "success" ? "text-emerald-500" : "text-rose-500"}`}>
-                    {status.message}
-                  </p>
-                </div>
-              </form>
+                  <div className="flex flex-col gap-4 pt-4 sm:flex-row sm:items-center sm:justify-between sm:pt-6">
+                    <button
+                      type="submit"
+                      className="inline-flex items-center justify-center rounded-3xl bg-linear-to-r from-purple-600 to-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-500/30 transition hover:scale-[1.02]"
+                    >
+                      {editingId ? "Update Student" : "Save Student"}
+                    </button>
+                    <p
+                      className={`text-sm ${status.type === "success" ? "text-emerald-500" : "text-rose-500"}`}
+                    >
+                      {status.message}
+                    </p>
+                  </div>
+                </form>
+              )}
             </div>
           </div>
         </div>
