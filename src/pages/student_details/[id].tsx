@@ -142,12 +142,7 @@ const Student_details = (props: Props) => {
                 View Certificate
               </a>
             ) : null}
-            <button
-              onClick={handleDownloadJSON}
-              className="inline-flex items-center gap-2 rounded-2xl border border-slate-700 bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-200 hover:bg-slate-700"
-            >
-              Download
-            </button>
+            
           </div>
         </header>
 
