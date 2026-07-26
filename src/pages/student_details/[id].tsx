@@ -50,6 +50,7 @@ const Student_details = (props: Props) => {
         }
 
         setStudent(data.student);
+        localStorage.setItem("studentDetails", JSON.stringify(data.student));
       } catch (fetchError) {
         setError((fetchError as Error).message);
       } finally {
@@ -100,18 +101,6 @@ const Student_details = (props: Props) => {
     return null;
   }
 
-  const handleDownloadJSON = () => {
-    if (!student) return;
-    const data = JSON.stringify(student, null, 2);
-    const blob = new Blob([data], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${student.student_id || student.id}-details.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
   return (
     <div className="min-h-screen min-w-screen bg-slate-950 px-4 py-10 text-slate-100">
       <div className="mx-auto max-w-6xl">
@@ -134,7 +123,7 @@ const Student_details = (props: Props) => {
           <div className="flex items-center gap-3">
             {student.certificate_url ? (
               <a
-                href={student.certificate_url}
+                href="certificate_privew"
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-2 rounded-2xl bg-linear-to-r from-indigo-600 to-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-lg hover:opacity-95"
@@ -142,7 +131,6 @@ const Student_details = (props: Props) => {
                 View Certificate
               </a>
             ) : null}
-            
           </div>
         </header>
 
