@@ -150,7 +150,6 @@ export default async function handler(
     const docs = await db
       .collection("students")
       .find()
-      .sort({ createdAt: 1 })
       .toArray();
     const students = docs.map((doc) => ({
       id: doc._id.toString(),
