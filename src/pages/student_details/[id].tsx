@@ -50,9 +50,8 @@ const Student_details = (props: Props) => {
         }
 
         setStudent(data.student);
-        localStorage.setItem("studentDetails", JSON.stringify(data.student));
-      } catch (fetchError) {
-        setError((fetchError as Error).message);
+      } catch (error) {
+        setError((error as Error).message);
       } finally {
         setLoading(false);
       }
@@ -60,6 +59,55 @@ const Student_details = (props: Props) => {
 
     void fetchStudent();
   }, [id]);
+
+  const openCertificatePreview = () => {
+    const isImage =
+      student?.certificate_url?.startsWith("data:image/") ||
+      /\.(png|jpe?g|gif|webp|svg|bmp|avif)(\?.*)?$/i.test(
+        student?.certificate_url ?? "",
+      );
+
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>${student?.certidicate_id}</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh; 
+      display: flex;
+      justify-content: center;
+      align-items: center; 
+    }
+    img, iframe {
+      max-width: 100%;
+      max-height: 100vh;
+      border: none;
+    }
+    iframe {
+      width: 100vw;
+      height: 100vh;
+    }
+  </style>
+</head>
+<body>
+  ${
+    isImage
+      ? `<img src="${student?.certificate_url}" alt="Certificate" />`
+      : `<iframe src="${student?.certificate_url}" title="Certificate preview"></iframe>`
+  }
+</body>
+</html>`;
+
+    const blob = new Blob([html], { type: "text/html" });
+    const previewUrl = URL.createObjectURL(blob);
+    const newWindow = window.open(previewUrl, "_blank");
+    if (!newWindow) {
+      URL.revokeObjectURL(previewUrl);
+      return;
+    }
+  };
 
   if (!id || loading) {
     return (
@@ -122,14 +170,13 @@ const Student_details = (props: Props) => {
           </div>
           <div className="flex items-center gap-3">
             {student.certificate_url ? (
-              <a
-                href="certificate_privew"
-                target="_blank"
+              <button
+                onClick={openCertificatePreview}
                 rel="noreferrer"
                 className="inline-flex items-center gap-2 rounded-2xl bg-linear-to-r from-indigo-600 to-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-lg hover:opacity-95"
               >
                 View Certificate
-              </a>
+              </button>
             ) : null}
           </div>
         </header>
